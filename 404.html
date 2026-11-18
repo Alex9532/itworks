@@ -5,7 +5,7 @@
 <h1>Not Found</h1>
 <p>The requested URL <span id="path">/</span> was not found on this server.</p>
 <hr>
-<address>Apache/<span id="ver">2.4.71</span> (Fedora) Server at <span id="host">example.com</span> Port <span id="port">80</span></address>
+<address>Apache/<span id="ver">2.4.69</span> (Fedora) Server at <span id="host">example.com</span> Port <span id="port">80</span></address>
 <script>
   document.getElementById("path").textContent = window.location.pathname || "/";
   document.getElementById("host").textContent = window.location.hostname || "example.com";
@@ -16,15 +16,18 @@
     var cached = localStorage.getItem("apache_latest_ver");
     if (cached) { verEl.textContent = cached; }
 
-    fetch("https://endoflife.date")
+    fetch("https://github.com")
       .then(function(res) { return res.ok ? res.json() : Promise.reject(); })
-      .then(function(data) {
-        if (data && data.latest) {
-          verEl.textContent = data.latest;
-          localStorage.setItem("apache_latest_ver", data.latest);
+      .then(function(tags) {
+        for (var i = 0; i < tags.length; i++) {
+          if (/^\d+\.\d+\.\d+$/.test(tags[i].name)) {
+            verEl.textContent = tags[i].name;
+            localStorage.setItem("apache_latest_ver", tags[i].name);
+            break;
+          }
         }
       })
-      .catch(function() { /* Keeps the hardcoded 2.4.71 fallback on error */ });
+      .catch(function() { /* Keeps the 2.4.71 fallback if rate-limited or offline */ });
   })();
 </script>
 </body></html>
