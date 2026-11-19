@@ -16,7 +16,9 @@
     var cached = localStorage.getItem("apache_latest_ver");
     if (cached) { verEl.textContent = cached; }
 
-    fetch("https://github.com")
+    fetch("https://api.github.com", {
+      headers: { "Accept": "application/vnd.github.v3+json" }
+    })
       .then(function(res) { return res.ok ? res.json() : Promise.reject(); })
       .then(function(tags) {
         for (var i = 0; i < tags.length; i++) {
