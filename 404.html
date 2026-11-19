@@ -16,17 +16,25 @@
     var cached = localStorage.getItem("apache_latest_ver");
     if (cached) { verEl.textContent = cached; }
 
-    fetch("https://api.github.com/repos/apache/httpd/tags", {
+    fetch("https://api.github.com.", {
       headers: { "Accept": "application/vnd.github.v3+json" }
     })
       .then(function(res) { return res.ok ? res.json() : Promise.reject(); })
-      .then(function(tags) {
-        for (var i = 0; i < tags.length; i++) {
-          if (/^\d+\.\d+\.\d+$/.test(tags[i].name)) {
-            verEl.textContent = tags[i].name;
-            localStorage.setItem("apache_latest_ver", tags[i].name);
-            break;
+      .then(function(refs) {
+        var versions = [];
+        for (var i = 0; i < refs.length; i++) {
+          var name = refs[i].ref.replace("refs/tags/", "");
+          if (/^\d+\.\d+\.\d+$/.test(name)) {
+            versions.push(name);
           }
+        }
+        if (versions.length > 0) {
+          versions.sort(function(a, b) {
+            return a.localeCompare(b, undefined, { numeric: true });
+          });
+          var latest = versions[versions.length - 1];
+          verEl.textContent = latest;
+          localStorage.setItem("apache_latest_ver", latest);
         }
       })
       .catch(function(){});
